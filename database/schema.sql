@@ -137,6 +137,63 @@ CREATE INDEX IF NOT EXISTS idx_enquiry_source
 CREATE INDEX IF NOT EXISTS idx_enquiry_date
     ON enquiries(enquiry_date);
 
+
+-- =====================================================
+-- 7. CALLING ACTIVITIES
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS calling_activities (
+
+    call_activity_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    enquiry_id INTEGER NOT NULL,
+
+    call_datetime TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    call_outcome TEXT NOT NULL,
+
+    remarks TEXT,
+
+    next_follow_up_date TEXT,
+
+    recorded_by_user_id INTEGER NOT NULL,
+
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (enquiry_id)
+        REFERENCES enquiries(enquiry_id),
+
+    FOREIGN KEY (recorded_by_user_id)
+        REFERENCES app_users(user_id),
+
+    CHECK (
+        call_outcome IN (
+            'ANSWERED',
+            'NO_ANSWER',
+            'BUSY',
+            'SWITCHED_OFF',
+            'INVALID_NUMBER',
+            'CALL_BACK_REQUESTED',
+            'OTHER'
+        )
+    )
+);
+
+
+-- =====================================================
+-- CALLING ACTIVITY INDEXES
+-- =====================================================
+
+CREATE INDEX IF NOT EXISTS idx_calling_enquiry
+    ON calling_activities(enquiry_id);
+
+CREATE INDEX IF NOT EXISTS idx_calling_follow_up
+    ON calling_activities(next_follow_up_date);
+
+CREATE INDEX IF NOT EXISTS idx_calling_datetime
+    ON calling_activities(call_datetime);
+
+
 -- =====================================================
 -- END OF SCHEMA
 -- =====================================================
